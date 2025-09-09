@@ -1,21 +1,27 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (use npm install instead of npm ci since we don't have lock file)
+RUN npm install --only=production
 
 # Copy source code
 COPY . .
 
+# Install dev dependencies for build
+RUN npm install
+
 # Build the application
 RUN npm run build
 
+# Remove dev dependencies after build
+RUN npm prune --production
+
 # Expose port
-EXPOSE 3015
+EXPOSE 4000
 
 # Start the application
 CMD ["npm", "run", "start:prod"] 

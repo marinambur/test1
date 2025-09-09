@@ -7,7 +7,9 @@ async function bootstrap() {
   
   // Enable CORS
   app.enableCors({
-    origin: ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3100', 'http://127.0.0.1:3100'],
+    origin: process.env.NODE_ENV === 'production' 
+      ? process.env.FRONTEND_URL || true  // In production, allow Railway URLs
+      : ['http://localhost:3001', 'http://127.0.0.1:3001', 'http://localhost:3100', 'http://127.0.0.1:3100'],
     credentials: true,
   });
 

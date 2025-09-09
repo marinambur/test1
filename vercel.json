@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.output/public",
+  "framework": "nuxtjs",
+  "env": {
+    "NUXT_PUBLIC_API_URL": "https://your-backend-url.railway.app/graphql"
+  },
+  "functions": {
+    "frontend/.output/server/index.mjs": {
+      "runtime": "nodejs20.x"
+    }
+  }
+} 
