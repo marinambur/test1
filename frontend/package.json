@@ -1,0 +1,37 @@
+{
+  "name": "transaction-history-frontend",
+  "version": "1.0.0",
+  "description": "Nuxt 3 frontend for transaction history",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "nuxt typecheck"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxt/eslint-config": "^0.2.0",
+    "@nuxtjs/tailwindcss": "^6.8.4",
+    "eslint": "^8.55.0",
+    "nuxt": "^3.8.4",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.8.8",
+    "@nuxtjs/apollo": "^5.0.0-alpha.5",
+    "@pinia/nuxt": "^0.5.1",
+    "@tanstack/vue-virtual": "^3.0.0",
+    "@vueuse/core": "^10.5.0",
+    "@vueuse/nuxt": "^10.5.0",
+    "date-fns": "^2.30.0",
+    "graphql": "^16.8.1",
+    "graphql-tag": "^2.12.6",
+    "pinia": "^2.1.7",
+    "vue": "^3.5.21"
+  }
+}

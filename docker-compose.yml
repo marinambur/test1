@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: transaction-history-db
+    environment:
+      POSTGRES_DB: transaction_history
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: transaction-history-backend
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/transaction_history
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: transaction-history-frontend
+    environment:
+      NUXT_PUBLIC_API_URL: http://backend:4000/graphql
+    ports:
+      - "3100:3100"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data: 
