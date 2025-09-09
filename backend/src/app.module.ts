@@ -9,6 +9,7 @@ import { TransactionModule } from "./transaction/transaction.module";
 import { Transaction } from "./transaction/entities/transaction.entity";
 import { databaseConfig } from "./config/database.config";
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -71,5 +72,6 @@ import { databaseConfig } from "./config/database.config";
     }),
     TransactionModule,
   ],
+  controllers: [],
 })
 export class AppModule {}
