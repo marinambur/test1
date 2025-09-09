@@ -13,6 +13,7 @@ export const useTransactionStore = defineStore("transaction", () => {
   const transactions = ref<Transaction[]>([]);
   const total = ref(0);
   const loading = ref(false);
+  const silentLoading = ref(false); // For background updates without UI loading state
   const error = ref<string | null>(null);
 
   // Filters state
@@ -44,10 +45,19 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   // Actions
   const setFilters = (newFilters: Partial<TransactionFilters>) => {
+    // Check if actual filter values changed (not just page)
+    const filterFieldsChanged = (
+      (newFilters.startDate !== undefined && newFilters.startDate !== filters.value.startDate) ||
+      (newFilters.endDate !== undefined && newFilters.endDate !== filters.value.endDate) ||
+      (newFilters.type !== undefined && newFilters.type !== filters.value.type) ||
+      (newFilters.minAmount !== undefined && newFilters.minAmount !== filters.value.minAmount)
+    );
+
     filters.value = {
       ...filters.value,
       ...newFilters,
-      page: newFilters.page || 1, // Reset to first page when filters change
+      // Reset to page 1 only if filter fields changed and page wasn't explicitly set
+      page: filterFieldsChanged && newFilters.page === undefined ? 1 : (newFilters.page !== undefined ? newFilters.page : filters.value.page),
     };
   };
 
@@ -78,6 +88,10 @@ export const useTransactionStore = defineStore("transaction", () => {
     loading.value = value;
   };
 
+  const setSilentLoading = (value: boolean) => {
+    silentLoading.value = value;
+  };
+
   const setError = (message: string | null) => {
     error.value = message;
   };
@@ -102,6 +116,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     transactions: readonly(transactions),
     total: readonly(total),
     loading: readonly(loading),
+    silentLoading: readonly(silentLoading),
     error: readonly(error),
     filters: readonly(filters),
     selectedCurrency: readonly(selectedCurrency),
@@ -119,6 +134,7 @@ export const useTransactionStore = defineStore("transaction", () => {
     setCurrency,
     setLocale,
     setLoading,
+    setSilentLoading,
     setError,
     setTransactions,
     addTransaction,

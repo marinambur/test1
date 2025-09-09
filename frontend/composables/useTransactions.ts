@@ -59,15 +59,18 @@ const CREATE_TRANSACTION = gql`
 export const useTransactions = () => {
   const store = useTransactionStore()
 
-  const fetchTransactions = async (filters?: Partial<TransactionFilters>) => {
+  const fetchTransactions = async (filters?: Partial<TransactionFilters>, silent = false) => {
     try {
-      store.setLoading(true)
+      if (silent) {
+        store.setSilentLoading(true)
+      } else {
+        store.setLoading(true)
+      }
       store.setError(null)
 
       // Prepare query variables
       let queryFilters = store.filters
       if (filters) {
-        // Update store filters only if they're different
         store.setFilters(filters)
         queryFilters = store.filters
       }
@@ -87,7 +90,11 @@ export const useTransactions = () => {
       store.setError(message)
       console.error('Error fetching transactions:', error)
     } finally {
-      store.setLoading(false)
+      if (silent) {
+        store.setSilentLoading(false)
+      } else {
+        store.setLoading(false)
+      }
     }
   }
 
@@ -119,17 +126,19 @@ export const useTransactions = () => {
     return fetchTransactions()
   }
 
-  const nextPage = () => {
+  const nextPage = async () => {
     if (store.hasNextPage) {
-      store.setPage(store.filters.page + 1)
-      return fetchTransactions()
+      const newPage = store.filters.page + 1
+      store.setPage(newPage)
+      return fetchTransactions(undefined, true)
     }
   }
 
-  const previousPage = () => {
+  const previousPage = async () => {
     if (store.hasPreviousPage) {
-      store.setPage(store.filters.page - 1)
-      return fetchTransactions()
+      const newPage = store.filters.page - 1
+      store.setPage(newPage)
+      return fetchTransactions(undefined, true)
     }
   }
 

@@ -1,6 +1,12 @@
 <template>
-  <div class="transaction-filters bg-white rounded-lg shadow p-6 mb-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+  <div class="transaction-filters bg-white rounded-lg shadow p-4 mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+      <div v-if="store.silentLoading" class="flex items-center text-sm text-gray-500">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+        Updating...
+      </div>
+    </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Date Range -->
@@ -59,7 +65,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="flex justify-end items-center mt-6">
+    <div class="flex justify-end items-center mt-4">
       <button
         @click="clearFilters"
         class="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -85,7 +91,7 @@
           To: {{ formatDisplayDate(localFilters.endDate) }}
         </span>
         <span
-          v-if="localFilters.type"
+          v-if="localFilters.type && localFilters.type !== ''"
           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
         >
           Type: {{ localFilters.type }}
@@ -110,8 +116,15 @@ const { fetchTransactions } = useTransactions()
 
 const isLoading = computed(() => store.loading)
 
-// Local filters state for form binding
-const localFilters = ref<Partial<TransactionFilters>>({
+// Local filters state for form binding (allows string values from form inputs)
+interface LocalFiltersState {
+  startDate?: string
+  endDate?: string
+  type?: TransactionType | string
+  minAmount?: number
+}
+
+const localFilters = ref<LocalFiltersState>({
   startDate: store.filters.startDate,
   endDate: store.filters.endDate,
   type: store.filters.type,
@@ -135,38 +148,32 @@ const hasActiveFilters = computed(() => {
   return !!(
     localFilters.value.startDate ||
     localFilters.value.endDate ||
-    localFilters.value.type ||
+    (localFilters.value.type && localFilters.value.type !== '') ||
     (localFilters.value.minAmount !== undefined && localFilters.value.minAmount > 0)
   )
 })
 
 const applyFilters = async () => {
-  // Clean up empty values
-  const cleanFilters: Partial<TransactionFilters> = {}
-  
-  if (localFilters.value.startDate) {
-    cleanFilters.startDate = localFilters.value.startDate
-  }
-  
-  if (localFilters.value.endDate) {
-    cleanFilters.endDate = localFilters.value.endDate
-  }
-  
-  if (localFilters.value.type) {
-    cleanFilters.type = localFilters.value.type as TransactionType
-  }
-  
-  if (localFilters.value.minAmount !== undefined && localFilters.value.minAmount > 0) {
-    cleanFilters.minAmount = localFilters.value.minAmount
+  const cleanFilters: Partial<TransactionFilters> = {
+    startDate: localFilters.value.startDate || undefined,
+    endDate: localFilters.value.endDate || undefined,
+    type: (localFilters.value.type && localFilters.value.type !== '') 
+      ? localFilters.value.type as TransactionType 
+      : undefined,
+    minAmount: (localFilters.value.minAmount !== undefined && localFilters.value.minAmount > 0) 
+      ? localFilters.value.minAmount 
+      : undefined
   }
 
   isInternalUpdate = true
   try {
-    await fetchTransactions(cleanFilters)
+    await fetchTransactions(cleanFilters, true)
   } finally {
     isInternalUpdate = false
   }
 }
+
+
 
 const clearFilters = async () => {
   localFilters.value = {
@@ -183,7 +190,7 @@ const clearFilters = async () => {
       endDate: undefined,
       type: undefined,
       minAmount: undefined,
-    })
+    }, false)
   } finally {
     isInternalUpdate = false
   }

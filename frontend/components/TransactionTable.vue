@@ -42,7 +42,7 @@
       </div>
 
       <!-- Virtual List Container -->
-      <div class="relative" style="height: 400px;">
+      <div class="relative" style="height: 280px;">
         <div
           ref="scrollContainer"
           class="overflow-auto"
@@ -128,7 +128,7 @@ const { refetch, nextPage, previousPage, resetAndRefetch } = useTransactions()
 
 // Virtual scrolling properties
 const itemHeight = 60
-const containerHeight = 400
+const containerHeight = 280
 const visibleCount = Math.ceil(containerHeight / itemHeight) + 2
 const scrollContainer = ref<HTMLElement>()
 
