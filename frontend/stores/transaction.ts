@@ -97,12 +97,15 @@ export const useTransactionStore = defineStore("transaction", () => {
   };
 
   const setTransactions = (data: TransactionConnection) => {
-    transactions.value = data.transactions;
+    transactions.value = [...data.transactions]; // Create a new mutable array
     total.value = data.total;
   };
 
   const addTransaction = (transaction: Transaction) => {
-    transactions.value.unshift(transaction);
+    // Add new transaction and sort by date (newest first)
+    const newTransactions = [transaction, ...transactions.value];
+    newTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    transactions.value = newTransactions;
     total.value += 1;
   };
 

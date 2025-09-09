@@ -131,13 +131,22 @@ const emit = defineEmits<{
 
 const { createTransaction } = useTransactions()
 
+// Helper function to get current local datetime for datetime-local input
+const getCurrentLocalDateTime = () => {
+  const now = new Date()
+  // Offset timezone difference to get local time in ISO format
+  const offset = now.getTimezoneOffset() * 60000
+  const localTime = new Date(now.getTime() - offset)
+  return localTime.toISOString().slice(0, 16)
+}
+
 // Form state
 const form = ref<CreateTransactionInput>({
   type: '' as TransactionType,
   amount: 0,
   currency: '' as Currency,
   description: '',
-  date: new Date().toISOString().slice(0, 16), // datetime-local format
+  date: getCurrentLocalDateTime(),
   idempotencyKey: uuidv4(),
 })
 
@@ -183,5 +192,6 @@ const handleSubmit = async () => {
 // Reset form when modal opens
 onMounted(() => {
   form.value.idempotencyKey = uuidv4()
+  form.value.date = getCurrentLocalDateTime() // Set current time when modal opens
 })
 </script> 
