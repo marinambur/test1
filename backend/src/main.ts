@@ -44,23 +44,34 @@ async function bootstrap() {
   // Add simple health check route
   const httpAdapter = app.getHttpAdapter();
   httpAdapter.get('/', (req, res) => {
-    res.json({
+    console.log(`🩺 Health check accessed from ${req.ip || 'unknown'}`);
+    const response = {
       status: 'ok',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || 'development',
       port: port,
-    });
+      version: '1.0.0',
+      host: req.get('host') || 'unknown'
+    };
+    console.log(`📤 Sending health response:`, response);
+    res.json(response);
   });
 
   await app.listen(port, host);
-
+  console.log(`🚀 Server started successfully!`);
+  
   const url = await app.getUrl();
   console.log(
     `✅ Server is listening on ${url} (GraphQL: ${url.replace(/\/$/, "")}/graphql)`
   );
   console.log(`📊 Health check available at: ${url}`);
   console.log(`🔍 GraphQL Playground available at: ${url.replace(/\/$/, "")}/graphql`);
+  
+  // Keep alive ping
+  setInterval(() => {
+    console.log(`💓 Server alive at ${new Date().toISOString()}`);
+  }, 30000);
 }
 
 bootstrap();
