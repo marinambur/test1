@@ -8,7 +8,7 @@ async function bootstrap() {
   app.enableCors({
     origin:
       process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_URL || true // можно оставить true, если не хочешь сейчас настраивать
+        ? process.env.FRONTEND_URL || true
         : [
             "http://localhost:3001",
             "http://127.0.0.1:3001",
@@ -27,10 +27,13 @@ async function bootstrap() {
     })
   );
 
-  const port = Number(process.env.PORT) || 4000; // ⬅️ обязательно PORT от Railway
-  await app.listen(port, "0.0.0.0"); // ⬅️ слушать на всех интерфейсах
+  const port = Number(process.env.PORT) || 4000;
+  const host = "0.0.0.0";
+  console.log("process.env.PORT =", process.env.PORT);
 
-  // Корректно вывести фактический URL сервера на Railway:
+  console.log("Will bind to", host, "port", port);
+  await app.listen(port, host);
+
   const url = await app.getUrl();
   console.log(
     `✅ Server is listening on ${url} (GraphQL: ${url.replace(/\/$/, "")}/graphql)`
